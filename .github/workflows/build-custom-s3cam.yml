@@ -1,0 +1,32 @@
+name: Build Custom ESP32-S3 CAM
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: XiaoZhi ESP32-S3 Voice and Camera
+    runs-on: ubuntu-latest
+    container:
+      image: espressif/idf:release-v6.1
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v7
+
+      - name: Compile custom firmware
+        shell: bash
+        run: |
+          source "$IDF_PATH/export.sh"
+          python scripts/build.py bread-compact-wifi-s3cam-custom \
+            --name bread-compact-wifi-s3cam-custom
+
+      - name: Upload firmware
+        uses: actions/upload-artifact@v7
+        with:
+          name: xiaozhi-s3cam-custom-firmware
+          path: build/merged-binary.bin
+          if-no-files-found: error
